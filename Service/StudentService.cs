@@ -28,5 +28,17 @@ namespace StudentManagement.Service
 
             return data;
         }
+
+        public async Task DeleteStudent(int id)
+        {
+            await _studentRepository.DeleteStudent(id);
+        }
+
+        public async Task<Student> UpdateStudent(int id, Student student)
+        {
+            var data = await _studentRepository.UpdateStudent(id, student);
+            return data;
+        }
+
     }
 }

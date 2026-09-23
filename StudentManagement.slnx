@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="../StudentManagementMvc/StudentManagementMvc.csproj" Id="4466c30b-2ad7-4739-88ce-11366447f3be" />
   <Project Path="StudentManagement.csproj" />
 </Solution>
