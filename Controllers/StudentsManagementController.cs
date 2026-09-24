@@ -16,7 +16,7 @@ namespace StudentManagement.Controllers
             _studentService = studentService;
         }
 
-        [HttpGet("GetStudents")]
+        [HttpGet]
         public async Task<List<Student>> GetStudent()
         {
             return await _studentService.GetStudents();
@@ -28,20 +28,20 @@ namespace StudentManagement.Controllers
             return await _studentService.AddStudent(student);
         }
 
-        [HttpGet("id")]
+        [HttpGet("{id}")]
         public async Task<Student> GetStudentById(int id)
         {
             var data = await _studentService.GetStudentById(id);
             return data;
         }
 
-        [HttpDelete("id")]
+        [HttpDelete("{id}")]
         public async Task DeleteStudent(int id)
         {
             await _studentService.DeleteStudent(id);
         }
 
-        [HttpPut("id")]
+        [HttpPut("{id}")]
         public async Task<Student> UpdateStudent(int id, Student student)
         {
             return await _studentService.UpdateStudent(id, student);

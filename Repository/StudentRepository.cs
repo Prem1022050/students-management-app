@@ -29,12 +29,22 @@ namespace StudentManagement.Repository
             return student;
         }
 
-        public async Task DeleteStudent(int id) {
-            
-           var data= _context.StudentManagement.Remove(await _context.StudentManagement.FindAsync(id));
-           
+        public async Task<Student> DeleteStudent(int id)
+        {
+            var data = await _context.StudentManagement.FindAsync(id);
+
+            if (data == null)
+            {
+                return null;
+            }
+
+            _context.StudentManagement.Remove(data);
+
+            await _context.SaveChangesAsync();
+
+            return data;
         }
-        
+
         public async Task<Student> UpdateStudent(int id, Student student)
         {
             var existingStudent = await _context.StudentManagement.FindAsync(id);
