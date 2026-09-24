@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using StudentManagement.AzureStorage;
 using StudentManagement.Model;
 using StudentManagement.Service;
 
@@ -11,9 +12,11 @@ namespace StudentManagement.Controllers
     {
 
         private readonly IStudentService _studentService;
-        public StudentsManagementController(IStudentService studentService)
+        private readonly BlobService _blobService;
+        public StudentsManagementController(IStudentService studentService, BlobService blobService)
         {
             _studentService = studentService;
+            _blobService = blobService;
         }
 
         [HttpGet]
@@ -46,6 +49,36 @@ namespace StudentManagement.Controllers
         {
             return await _studentService.UpdateStudent(id, student);
 
+        }
+        [HttpPost("UploadImage")]
+        public async Task<IActionResult> UploadImage(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("Please select a file.");
+            }
+            if (file.Length > 2 * 1024 * 1024)
+            {
+                return BadRequest("File size cannot exceed 2 MB.");
+            }
+
+            var allowedTypes = new[]
+            {
+        "image/jpeg",
+        "image/png"
+    };
+
+            if (!allowedTypes.Contains(file.ContentType))
+            {
+                return BadRequest("Only JPG and PNG images are allowed.");
+            }
+            var imageUrl = await _blobService.UploadFileAsync(file);
+
+            return Ok(new
+            {
+                message = "File uploaded successfully",
+                url = imageUrl
+            });
         }
     }
 }

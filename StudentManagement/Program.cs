@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using StudentManagement.AzureStorage;
 using StudentManagement.DbContextFolder;
 using StudentManagement.Repository;
 using StudentManagement.Service;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddSingleton<BlobService>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 // Add services to the container.
