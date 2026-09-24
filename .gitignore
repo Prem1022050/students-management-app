@@ -1,26 +1,5 @@
-﻿# Visual Studio
 .vs/
+**/bin/
+**/obj/
 *.user
 *.suo
-
-# Build
-bin/
-obj/
-
-# User-specific files
-*.user
-*.rsuser
-
-# Publish
-publish/
-
-# Secrets / local configuration
-appsettings.Development.json
-appsettings.Local.json
-
-# Azure publish profile
-Properties/PublishProfiles/*.pubxml
-Properties/PublishProfiles/*.pubxml.user
-
-# Logs
-*.log

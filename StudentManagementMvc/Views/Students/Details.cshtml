@@ -1,0 +1,52 @@
+﻿@model StudentManagementMvc.Models.Student
+
+@{
+    ViewData["Title"] = "Student Details";
+}
+
+<h1>Student Details</h1>
+
+<div>
+    <dl class="row">
+
+        <dt class="col-sm-2">
+            ID
+        </dt>
+        <dd class="col-sm-10">
+            @Model.id
+        </dd>
+
+        <dt class="col-sm-2">
+            Name
+        </dt>
+        <dd class="col-sm-10">
+            @Model.name
+        </dd>
+
+        <dt class="col-sm-2">
+            Email
+        </dt>
+        <dd class="col-sm-10">
+            @Model.email
+        </dd>
+
+        <dt class="col-sm-2">
+            Age
+        </dt>
+        <dd class="col-sm-10">
+            @Model.age
+        </dd>
+
+    </dl>
+</div>
+
+<a asp-action="Edit"
+   asp-route-id="@Model.id"
+   class="btn btn-warning">
+    Edit
+</a>
+
+<a asp-action="Index"
+   class="btn btn-secondary">
+    Back
+</a>
