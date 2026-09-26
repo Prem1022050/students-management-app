@@ -11,10 +11,11 @@
         Add Student
     </a>
 </p>
-
 <table class="table table-bordered">
+
     <thead>
         <tr>
+            <th>Photo</th>
             <th>ID</th>
             <th>Name</th>
             <th>Email</th>
@@ -24,34 +25,59 @@
     </thead>
 
     <tbody>
+
         @foreach (var student in Model)
         {
             <tr>
+
+                <td>
+                    @if (!string.IsNullOrEmpty(student.profileImageUrl))
+                    {
+                        <img src="@Url.Action(
+                                                    "Image",
+                                                    "Students",
+                                                    new { fileName = student.profileImageUrl })"
+                             width="80"
+                             height="80"
+                             style="object-fit: cover;" />
+                    }
+                    else
+                    {
+                        <span>No Image</span>
+                    }
+                </td>
+
                 <td>@student.id</td>
+
                 <td>@student.name</td>
+
                 <td>@student.email</td>
+
                 <td>@student.age</td>
 
                 <td>
                     <a asp-action="Details"
                        asp-route-id="@student.id"
-                       class="btn btn-info btn-sm">
+                       class="btn btn-info">
                         Details
                     </a>
 
                     <a asp-action="Edit"
                        asp-route-id="@student.id"
-                       class="btn btn-warning btn-sm">
+                       class="btn btn-warning">
                         Edit
                     </a>
 
                     <a asp-action="Delete"
                        asp-route-id="@student.id"
-                       class="btn btn-danger btn-sm">
+                       class="btn btn-danger">
                         Delete
                     </a>
                 </td>
+
             </tr>
         }
+
     </tbody>
+
 </table>

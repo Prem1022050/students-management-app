@@ -41,29 +41,59 @@ namespace StudentManagementMvc.Controllers
             return View();
         }
 
-        // POST: Students/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Student student)
+        public async Task<IActionResult> Create(Student model)
         {
             if (!ModelState.IsValid)
             {
-                return View(student);
+                return View(model);
             }
 
-            var response = await _httpClient.PostAsJsonAsync(
-                "api/StudentsManagement", student);
+            using var form = new MultipartFormDataContent();
+
+            form.Add(
+                new StringContent(model.name),
+                "name");
+
+            form.Add(
+                new StringContent(model.email),
+                "email");
+
+            form.Add(
+                new StringContent(model.age.ToString()),
+                "age");
+
+            if (model.image != null && model.image.Length > 0)
+            {
+                var streamContent =
+                    new StreamContent(model.image.OpenReadStream());
+
+                streamContent.Headers.ContentType =
+                    new System.Net.Http.Headers.MediaTypeHeaderValue(
+                        model.image.ContentType);
+
+                form.Add(
+                    streamContent,
+                    "image",
+                    model.image.FileName);
+            }
+
+            var response = await _httpClient.PostAsync(
+                "api/StudentsManagement/AddStudentWithImage",
+                form);
 
             if (response.IsSuccessStatusCode)
             {
                 return RedirectToAction(nameof(Index));
             }
 
-            ModelState.AddModelError("", "Unable to create student.");
+            ModelState.AddModelError(
+                "",
+                "Unable to create student.");
 
-            return View(student);
+            return View(model);
         }
-
         // GET: Students/Edit/5
         public async Task<IActionResult> Edit(int id)
         {

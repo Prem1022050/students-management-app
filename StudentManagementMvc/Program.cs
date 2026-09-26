@@ -1,9 +1,14 @@
+using System.Configuration;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.GetConnectionString("dbConnection");
 
 builder.Services.AddHttpClient("StudentAPI", client =>
 {
     client.BaseAddress = new Uri("https://student-management-prem-bbe6bhfxbeh6buaz.centralindia-01.azurewebsites.net/");
 });
+
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

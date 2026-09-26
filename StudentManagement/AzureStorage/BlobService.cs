@@ -37,5 +37,28 @@ namespace StudentManagement.AzureStorage
 
             return fileName;
         }
+
+        public async Task<(Stream Stream, string ContentType)?> GetFileAsync(
+    string fileName)
+        {
+            var containerClient =
+                _blobServiceClient.GetBlobContainerClient(_containerName);
+
+            var blobClient =
+                containerClient.GetBlobClient(fileName);
+
+            if (!await blobClient.ExistsAsync())
+            {
+                return null;
+            }
+
+            var response =
+                await blobClient.DownloadStreamingAsync();
+
+            return (
+                response.Value.Content,
+                response.Value.Details.ContentType
+            );
+        }
     }
 }

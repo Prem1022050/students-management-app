@@ -25,10 +25,57 @@ namespace StudentManagement.Controllers
             return await _studentService.GetStudents();
         }
 
-        [HttpPost]
-        public async Task<Student> AddStudent(Student student)
+        //[HttpPost]
+        //public async Task<Student> AddStudent(Student student)
+        //{
+        //    return await _studentService.AddStudent(student);
+        //}
+
+        [HttpPost("AddStudentWithImage")]
+        public async Task<IActionResult> AddStudentWithImage(
+    [FromForm] string name,
+    [FromForm] string email,
+    [FromForm] int age,
+    IFormFile? image)
         {
-            return await _studentService.AddStudent(student);
+            string? imageFileName = null;
+
+            if (image != null && image.Length > 0)
+            {
+                if (image.Length > 2 * 1024 * 1024)
+                {
+                    return BadRequest(
+                        "File size cannot exceed 2 MB.");
+                }
+
+                var allowedTypes = new[]
+                {
+            "image/jpeg",
+            "image/png"
+        };
+
+                if (!allowedTypes.Contains(image.ContentType))
+                {
+                    return BadRequest(
+                        "Only JPG and PNG images are allowed.");
+                }
+
+                imageFileName =
+                    await _blobService.UploadFileAsync(image);
+            }
+
+            var student = new Student
+            {
+                name = name,
+                email = email,
+                age = age,
+                profileImageUrl = imageFileName
+            };
+
+            var result =
+                await _studentService.AddStudent(student);
+
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
@@ -50,35 +97,51 @@ namespace StudentManagement.Controllers
             return await _studentService.UpdateStudent(id, student);
 
         }
-        [HttpPost("UploadImage")]
-        public async Task<IActionResult> UploadImage(IFormFile file)
+
+        [HttpGet("GetStudentImage/{fileName}")]
+        public async Task<IActionResult> GetStudentImage(string fileName)
         {
-            if (file == null || file.Length == 0)
+            var result = await _blobService.GetFileAsync(fileName);
+
+            if (result == null)
             {
-                return BadRequest("Please select a file.");
-            }
-            if (file.Length > 2 * 1024 * 1024)
-            {
-                return BadRequest("File size cannot exceed 2 MB.");
+                return NotFound();
             }
 
-            var allowedTypes = new[]
-            {
-        "image/jpeg",
-        "image/png"
-    };
-
-            if (!allowedTypes.Contains(file.ContentType))
-            {
-                return BadRequest("Only JPG and PNG images are allowed.");
-            }
-            var imageUrl = await _blobService.UploadFileAsync(file);
-
-            return Ok(new
-            {
-                message = "File uploaded successfully",
-                url = imageUrl
-            });
+            return File(
+                result.Value.Stream,
+                result.Value.ContentType);
         }
+
+        //    [HttpPost("UploadImage")]
+        //    public async Task<IActionResult> UploadImage(IFormFile file)
+        //    {
+        //        if (file == null || file.Length == 0)
+        //        {
+        //            return BadRequest("Please select a file.");
+        //        }
+        //        if (file.Length > 2 * 1024 * 1024)
+        //        {
+        //            return BadRequest("File size cannot exceed 2 MB.");
+        //        }
+
+        //        var allowedTypes = new[]
+        //        {
+        //    "image/jpeg",
+        //    "image/png"
+        //};
+
+        //        if (!allowedTypes.Contains(file.ContentType))
+        //        {
+        //            return BadRequest("Only JPG and PNG images are allowed.");
+        //        }
+        //        var imageUrl = await _blobService.UploadFileAsync(file);
+
+        //        return Ok(new
+        //        {
+        //            message = "File uploaded successfully",
+        //            url = imageUrl
+        //        });
+        //    }
     }
 }
