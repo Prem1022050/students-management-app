@@ -6,31 +6,93 @@
 
 <h1>Edit Student</h1>
 
-<form asp-action="Edit" method="post">
+<form asp-action="Edit"
+      method="post"
+      enctype="multipart/form-data">
 
     <input type="hidden" asp-for="id" />
 
-    <div class="form-group mb-3">
-        <label asp-for="name"></label>
-        <input asp-for="name" class="form-control" />
+    <div class="mb-3">
+        <label asp-for="name" class="form-label">
+            Name
+        </label>
+
+        <input asp-for="name"
+               class="form-control" />
     </div>
 
-    <div class="form-group mb-3">
-        <label asp-for="email"></label>
-        <input asp-for="email" class="form-control" />
+    <div class="mb-3">
+        <label asp-for="email" class="form-label">
+            Email
+        </label>
+
+        <input asp-for="email"
+               class="form-control" />
     </div>
 
-    <div class="form-group mb-3">
-        <label asp-for="age"></label>
-        <input asp-for="age" class="form-control" />
+    <div class="mb-3">
+        <label asp-for="age" class="form-label">
+            Age
+        </label>
+
+        <input asp-for="age"
+               type="number"
+               class="form-control" />
     </div>
 
-    <button type="submit" class="btn btn-primary">
-        Save
+    @if (!string.IsNullOrEmpty(
+        Model.profileImageUrl))
+    {
+        <div class="mb-3">
+
+            <label class="form-label">
+                Current Image
+            </label>
+
+            <br />
+
+            <img src="@Url.Action(
+                            "Image",
+                            "Students",
+                            new
+                            {
+                                fileName =
+                                    Model.profileImageUrl
+                            })"
+                 width="150"
+                 height="150"
+                 style="object-fit: cover;"
+                 class="rounded" />
+
+        </div>
+    }
+
+    <div class="mb-3">
+
+        <label asp-for="image"
+               class="form-label">
+            Change Image
+        </label>
+
+        <input asp-for="image"
+               type="file"
+               accept=".jpg,.jpeg,.png"
+               class="form-control" />
+
+        <small class="text-muted">
+            Leave empty to keep the current image.
+        </small>
+
+    </div>
+
+    <button type="submit"
+            class="btn btn-success">
+        Update
     </button>
 
-    <a asp-action="Index" class="btn btn-secondary">
-        Back
+    <a asp-action="Index"
+       class="btn btn-secondary">
+        Cancel
     </a>
 
 </form>

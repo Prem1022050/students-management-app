@@ -17,7 +17,16 @@ namespace StudentManagement.AzureStorage
             _blobServiceClient =
                 new BlobServiceClient(connectionString);
         }
+        public async Task DeleteFileAsync(string fileName)
+        {
+            var containerClient =
+                _blobServiceClient.GetBlobContainerClient(_containerName);
 
+            var blobClient =
+                containerClient.GetBlobClient(fileName);
+
+            await blobClient.DeleteIfExistsAsync();
+        }
         public async Task<string> UploadFileAsync(IFormFile file)
         {
             var containerClient =
@@ -39,7 +48,7 @@ namespace StudentManagement.AzureStorage
         }
 
         public async Task<(Stream Stream, string ContentType)?> GetFileAsync(
-    string fileName)
+     string fileName)
         {
             var containerClient =
                 _blobServiceClient.GetBlobContainerClient(_containerName);
@@ -52,8 +61,7 @@ namespace StudentManagement.AzureStorage
                 return null;
             }
 
-            var response =
-                await blobClient.DownloadStreamingAsync();
+            var response = await blobClient.DownloadStreamingAsync();
 
             return (
                 response.Value.Content,

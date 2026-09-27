@@ -113,6 +113,76 @@ namespace StudentManagement.Controllers
                 result.Value.ContentType);
         }
 
+
+        [HttpPut("{id}/UpdateWithImage")]
+        public async Task<IActionResult> UpdateWithImage(
+    int id,
+    [FromForm] string name,
+    [FromForm] string email,
+    [FromForm] int age,
+    IFormFile? image)
+        {
+            var existingStudent =
+                await _studentService.GetStudentById(id);
+
+            if (existingStudent == null)
+            {
+                return NotFound("Student not found.");
+            }
+
+            // Keep the existing image by default
+            string? imageFileName =
+                existingStudent.profileImageUrl;
+
+            if (image != null && image.Length > 0)
+            {
+                // Validate file size
+                if (image.Length > 2 * 1024 * 1024)
+                {
+                    return BadRequest(
+                        "File size cannot exceed 2 MB.");
+                }
+
+                // Validate file type
+                var allowedTypes = new[]
+                {
+            "image/jpeg",
+            "image/png"
+        };
+
+                if (!allowedTypes.Contains(image.ContentType))
+                {
+                    return BadRequest(
+                        "Only JPG and PNG images are allowed.");
+                }
+
+                // Upload new image
+                var newImageFileName =
+                    await _blobService.UploadFileAsync(image);
+
+                // Delete old image
+                if (!string.IsNullOrEmpty(
+                    existingStudent.profileImageUrl))
+                {
+                    await _blobService.DeleteFileAsync(
+                        existingStudent.profileImageUrl);
+                }
+
+                imageFileName = newImageFileName;
+            }
+
+            existingStudent.name = name;
+            existingStudent.email = email;
+            existingStudent.age = age;
+            existingStudent.profileImageUrl = imageFileName;
+
+            var updatedStudent =
+                await _studentService.UpdateStudent(
+                    id,
+                    existingStudent);
+
+            return Ok(updatedStudent);
+        }
         //    [HttpPost("UploadImage")]
         //    public async Task<IActionResult> UploadImage(IFormFile file)
         //    {

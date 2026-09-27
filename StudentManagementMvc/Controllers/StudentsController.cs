@@ -21,6 +21,31 @@ namespace StudentManagementMvc.Controllers
             return View(students);
         }
 
+        public async Task<IActionResult> Image(string fileName)
+        {
+            if (string.IsNullOrWhiteSpace(fileName))
+            {
+                return NotFound();
+            }
+
+            var response = await _httpClient.GetAsync(
+                $"api/StudentsManagement/GetStudentImage/{Uri.EscapeDataString(fileName)}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
+
+            var contentType =
+                response.Content.Headers.ContentType?.ToString()
+                ?? "application/octet-stream";
+
+            var bytes = await response.Content.ReadAsByteArrayAsync();
+
+            return File(bytes, contentType);
+        }
+
+
         // GET: Students/Details/5
         public async Task<IActionResult> Details(int id)
         {
@@ -108,34 +133,72 @@ namespace StudentManagementMvc.Controllers
             return View(student);
         }
 
-        // POST: Students/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Student student)
+        public async Task<IActionResult> Edit(
+     int id,
+     Student model)
         {
-            if (id != student.id)
+            if (id != model.id)
             {
                 return BadRequest();
             }
 
             if (!ModelState.IsValid)
             {
-                return View(student);
+                return View(model);
             }
 
-            var response = await _httpClient.PutAsJsonAsync(
-                $"api/StudentsManagement/{id}", student);
+            using var form =
+                new MultipartFormDataContent();
+
+            form.Add(
+                new StringContent(model.name),
+                "name");
+
+            form.Add(
+                new StringContent(model.email),
+                "email");
+
+            form.Add(
+                new StringContent(model.age.ToString()),
+                "age");
+
+            if (model.image != null &&
+                model.image.Length > 0)
+            {
+                var streamContent =
+                    new StreamContent(
+                        model.image.OpenReadStream());
+
+                streamContent.Headers.ContentType =
+                    new System.Net.Http.Headers
+                        .MediaTypeHeaderValue(
+                            model.image.ContentType);
+
+                form.Add(
+                    streamContent,
+                    "image",
+                    model.image.FileName);
+            }
+
+            var response =
+                await _httpClient.PutAsync(
+                    $"api/StudentsManagement/{id}/UpdateWithImage",
+                    form);
 
             if (response.IsSuccessStatusCode)
             {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(
+                    nameof(Index));
             }
 
-            ModelState.AddModelError("", "Unable to update student.");
+            ModelState.AddModelError(
+                "",
+                "Unable to update student.");
 
-            return View(student);
+            return View(model);
         }
-
         // GET: Students/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
